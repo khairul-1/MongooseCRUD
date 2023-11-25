@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 
-// Create a new user
+// New user creation
 export const createNewUser = async (req: Request, res: Response) => {
   try {
     const {
