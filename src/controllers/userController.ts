@@ -211,3 +211,61 @@ export const calculateTotalPrice = async (req: Request, res: Response) => {
     });
   }
 };
+
+//-------------all orders of a user-------
+// export const calculateTotalPrice = async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.params.userId;
+
+//     // Check if the user exists in the database
+//     const user = await UserModel.findOne({ userId }, '-password');
+export const getAllOrdersForUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+
+    // Check if the user exists in the database
+    const user = await UserModel.findOne({ userId }, '-password');
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+      return;
+    }
+
+    // Retrieve the user's orders
+    const userOrders = user.orders || [];
+
+    if (userOrders.length === 0) {
+      res.json({
+        success: true,
+        message: 'No orders found for the user',
+        data: {
+          orders: [],
+        },
+      });
+      return;
+    }
+
+    res.json({
+      success: true,
+      message: 'Orders fetched successfully!',
+      data: {
+        orders: userOrders,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: {
+        code: 500,
+        description: error.message,
+      },
+    });
+  }
+};

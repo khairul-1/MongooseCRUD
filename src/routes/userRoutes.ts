@@ -9,5 +9,6 @@ router.get('/:userId', UserController.getUserById);
 router.put('/:userId', UserController.updateUser);
 router.delete('/:userId', UserController.deleteUser);
 router.get('/:userId/orders/total-price', UserController.calculateTotalPrice);
+router.get('/:userId/orders', UserController.getAllOrdersForUser);
 
 export default router;
