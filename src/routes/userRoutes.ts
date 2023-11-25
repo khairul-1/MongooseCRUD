@@ -10,5 +10,6 @@ router.put('/:userId', UserController.updateUser);
 router.delete('/:userId', UserController.deleteUser);
 router.get('/:userId/orders/total-price', UserController.calculateTotalPrice);
 router.get('/:userId/orders', UserController.getAllOrdersForUser);
+router.put('/:userId/orders', UserController.addNewProductInOrder);
 
 export default router;

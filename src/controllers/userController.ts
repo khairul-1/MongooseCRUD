@@ -269,3 +269,64 @@ export const getAllOrdersForUser = async (req: Request, res: Response) => {
     });
   }
 };
+
+//==== New order add-----
+// export const calculateTotalPrice = async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.params.userId;
+
+//     // Check if the user exists in the database
+//     const user = await UserModel.findOne({ userId }, '-password');
+export const addNewProductInOrder = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const { productName, price, quantity } = req.body;
+
+    // Check if the user exists in the database
+    const user = await UserModel.findOne({ userId }, '-password');
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+      return;
+    }
+
+    // Create order object
+    const newOrder = {
+      productName,
+      price,
+      quantity,
+    };
+
+    // If the user already has orders, append the new order to the existing orders array
+    if (user.orders) {
+      user.orders.push(newOrder);
+    } else {
+      // If 'orders' property doesn't exist for the user, create it and add the order
+      user.orders = [newOrder];
+    }
+
+    // Save the updated user object with the new order
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Order created successfully!',
+      data: null,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: {
+        code: 500,
+        description: error.message,
+      },
+    });
+  }
+};
