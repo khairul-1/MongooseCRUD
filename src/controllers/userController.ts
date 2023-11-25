@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 
-// New user creation
+//............. create user ..........
+
 export const createNewUser = async (req: Request, res: Response) => {
   try {
     const {
@@ -17,7 +18,7 @@ export const createNewUser = async (req: Request, res: Response) => {
       address,
     } = req.body;
 
-    // Hash the password before saving it to the database
+    //..... password protected.............
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await UserModel.create({
@@ -30,10 +31,9 @@ export const createNewUser = async (req: Request, res: Response) => {
       isActive,
       hobbies,
       address,
-      orders: [], // Assuming orders are initially empty for a new user
+      orders: [],
     });
 
-    // Return the created user without the password field in the response
     const { password: omitPassword, ...userWithoutPassword } =
       newUser.toObject();
     res.status(201).json({
@@ -50,7 +50,7 @@ export const createNewUser = async (req: Request, res: Response) => {
   }
 };
 
-// Get all users
+// -------------query all user from database-------------------
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
     const users = await UserModel.find(
@@ -72,7 +72,7 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   }
 };
 
-// Get a specific user by ID
+// ----Query a single user----------------
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
@@ -98,7 +98,8 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-// Update user information
+//--------user info update-----------
+
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
@@ -112,11 +113,9 @@ export const updateUser = async (req: Request, res: Response) => {
         .json({ success: false, message: 'User not found' });
     }
 
-    // Update user information based on updatedUserData
     Object.assign(user, updatedUserData);
     await user.save();
 
-    // Return updated user without the password field
     const { password: omitPassword, ...userWithoutPassword } = user.toObject();
     res.status(200).json({
       success: true,
@@ -132,7 +131,8 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-// Delete a user
+// --------delete user----------------
+
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
@@ -158,16 +158,8 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-//----------------------
-// Get a specific user by ID
-// export const getUserById = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.params.userId;
-//     const user = await UserModel.findOne({ userId }, '-password');
+//----------price of orders------------------
 
-//     if (!user) {
-
-//calculate price of orders
 export const calculateTotalPrice = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
@@ -186,7 +178,6 @@ export const calculateTotalPrice = async (req: Request, res: Response) => {
       return;
     }
 
-    // Fetch the user's orders and calculate total price
     const userOrders = user.orders || [];
     let totalPrice = 0;
     userOrders.forEach((order) => {
@@ -197,7 +188,7 @@ export const calculateTotalPrice = async (req: Request, res: Response) => {
       success: true,
       message: 'Total price calculated successfully!',
       data: {
-        totalPrice: totalPrice.toFixed(2), // Return total price with two decimal places
+        totalPrice: totalPrice.toFixed(2),
       },
     });
   } catch (error: any) {
@@ -213,17 +204,11 @@ export const calculateTotalPrice = async (req: Request, res: Response) => {
 };
 
 //-------------all orders of a user-------
-// export const calculateTotalPrice = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.params.userId;
 
-//     // Check if the user exists in the database
-//     const user = await UserModel.findOne({ userId }, '-password');
 export const getAllOrdersForUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
 
-    // Check if the user exists in the database
     const user = await UserModel.findOne({ userId }, '-password');
     if (!user) {
       res.status(404).json({
@@ -237,7 +222,6 @@ export const getAllOrdersForUser = async (req: Request, res: Response) => {
       return;
     }
 
-    // Retrieve the user's orders
     const userOrders = user.orders || [];
 
     if (userOrders.length === 0) {
@@ -271,18 +255,12 @@ export const getAllOrdersForUser = async (req: Request, res: Response) => {
 };
 
 //==== New order add-----
-// export const calculateTotalPrice = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.params.userId;
 
-//     // Check if the user exists in the database
-//     const user = await UserModel.findOne({ userId }, '-password');
 export const addNewProductInOrder = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const { productName, price, quantity } = req.body;
 
-    // Check if the user exists in the database
     const user = await UserModel.findOne({ userId }, '-password');
     if (!user) {
       res.status(404).json({
@@ -296,22 +274,18 @@ export const addNewProductInOrder = async (req: Request, res: Response) => {
       return;
     }
 
-    // Create order object
     const newOrder = {
       productName,
       price,
       quantity,
     };
 
-    // If the user already has orders, append the new order to the existing orders array
     if (user.orders) {
       user.orders.push(newOrder);
     } else {
-      // If 'orders' property doesn't exist for the user, create it and add the order
       user.orders = [newOrder];
     }
 
-    // Save the updated user object with the new order
     await user.save();
 
     res.json({

@@ -1,5 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+//interface used here
+
 interface FullName {
   firstName: string;
   lastName: string;
@@ -30,6 +32,8 @@ interface User extends Document {
   orders: Order[];
 }
 
+//.........schema used here..........
+
 const userSchema = new Schema<User>({
   userId: { type: Number, required: true, unique: true },
   username: { type: String, required: true, unique: true },
@@ -55,6 +59,8 @@ const userSchema = new Schema<User>({
     },
   ],
 });
+
+//....user model......
 
 const UserModel = mongoose.model<User>('User', userSchema);
 
